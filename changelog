@@ -1,0 +1,5 @@
+mavlink (1.0.12-0~ubuntu18.04.1) bionic; urgency=medium
+
+  * Initial release.
+
+ -- Toby Schneider <tes.aubergine@gmail.com>  Tue, 19 Nov 2019 12:39:00 -0400

@@ -14,14 +14,6 @@ environment-template-amd64: &environment-template-amd64
   DEB_BUILD_OPTIONS: "parallel=4"
   # one job only must do the source build for each distro
   DO_SOURCE_BUILD: "true"
-
-environment-template-arm64: &environment-template-arm64
-  TARGET_ARCH: "arm64"
-  DEB_BUILD_OPTIONS: "parallel=4 nocheck"
-  
-environment-template-armhf: &environment-template-armhf
-  TARGET_ARCH: "armhf"
-  DEB_BUILD_OPTIONS: "parallel=4 nocheck"
   
 environment-template-stretch: &environment-template-stretch
   DISTRO_RELEASE_CODENAME: "stretch"
@@ -119,10 +111,7 @@ job-template-amd64: &job-template-amd64
           - '*.deb'
           - '*.ddeb'
           - '*.changes'
-          - '*.buildinfo'
-  
-job-template-cross: &job-template-cross
-  <<: *job-template-amd64
+          - '*.buildinfo'  
 
 # base upload off Bionic build
 job-template-upload: &job-template-upload
@@ -140,56 +129,29 @@ workflows:
       - amd64-stretch-build:
           requires:
             - get-orig-source
-      - arm64-stretch-build:
-          requires:
-            - amd64-stretch-build
-      - armhf-stretch-build:
-          requires:
-            - arm64-stretch-build
           
       - amd64-buster-build:
           requires:
             - get-orig-source
-      - arm64-buster-build:
-          requires:
-            - amd64-buster-build
-      - armhf-buster-build:
-          requires:
-            - arm64-buster-build
             
       - amd64-xenial-build:
           requires:
             - get-orig-source
-      - arm64-xenial-build:
-          requires:
-            - amd64-xenial-build
-      - armhf-xenial-build:
-          requires:
-            - arm64-xenial-build
             
       - amd64-bionic-build:
           requires:
             - get-orig-source
-      - arm64-bionic-build:
-          requires:
-            - amd64-bionic-build
-      - armhf-bionic-build:
-          requires:
-            - arm64-bionic-build
 
       - continuous-upload:
           requires:
-            - armhf-stretch-build
-            - armhf-buster-build
-            - armhf-bionic-build
-            - armhf-xenial-build
+            - amd64-stretch-build
+            - amd64-buster-build
+            - amd64-bionic-build
+            - amd64-xenial-build
 
       - release-upload:
           requires:
-            - armhf-stretch-build
-            - armhf-buster-build
-            - armhf-bionic-build
-            - armhf-xenial-build            
+            - continuous-upload
             
 jobs:
   get-orig-source:
@@ -235,20 +197,6 @@ jobs:
       <<: *environment-template-common
       <<: *environment-template-stretch
       <<: *environment-template-amd64
-  arm64-stretch-build: 
-    <<: *job-template-cross
-    docker: *docker-base-stretch
-    environment:
-      <<: *environment-template-common
-      <<: *environment-template-stretch
-      <<: *environment-template-arm64
-  armhf-stretch-build: 
-    <<: *job-template-cross
-    docker: *docker-base-stretch
-    environment:
-      <<: *environment-template-common
-      <<: *environment-template-stretch
-      <<: *environment-template-armhf
   amd64-buster-build:
     <<: *job-template-amd64
     docker: *docker-base-buster
@@ -256,20 +204,6 @@ jobs:
       <<: *environment-template-common
       <<: *environment-template-buster
       <<: *environment-template-amd64
-  arm64-buster-build: 
-    <<: *job-template-cross
-    docker: *docker-base-buster
-    environment:
-      <<: *environment-template-common
-      <<: *environment-template-buster
-      <<: *environment-template-arm64
-  armhf-buster-build: 
-    <<: *job-template-cross
-    docker: *docker-base-buster
-    environment:
-      <<: *environment-template-common
-      <<: *environment-template-buster
-      <<: *environment-template-armhf
   amd64-xenial-build:
     <<: *job-template-amd64
     docker: *docker-base-xenial
@@ -277,20 +211,6 @@ jobs:
       <<: *environment-template-common
       <<: *environment-template-xenial
       <<: *environment-template-amd64
-  arm64-xenial-build: 
-    <<: *job-template-cross
-    docker: *docker-base-xenial
-    environment:
-      <<: *environment-template-common
-      <<: *environment-template-xenial
-      <<: *environment-template-arm64
-  armhf-xenial-build: 
-    <<: *job-template-cross
-    docker: *docker-base-xenial
-    environment:
-      <<: *environment-template-common
-      <<: *environment-template-xenial
-      <<: *environment-template-armhf
   amd64-bionic-build:
     <<: *job-template-amd64
     docker: *docker-base-bionic
@@ -298,20 +218,6 @@ jobs:
       <<: *environment-template-common
       <<: *environment-template-bionic
       <<: *environment-template-amd64
-  arm64-bionic-build: 
-    <<: *job-template-cross
-    docker: *docker-base-bionic
-    environment:
-      <<: *environment-template-common
-      <<: *environment-template-bionic
-      <<: *environment-template-arm64
-  armhf-bionic-build: 
-    <<: *job-template-cross
-    docker: *docker-base-bionic
-    environment:
-      <<: *environment-template-common
-      <<: *environment-template-bionic
-      <<: *environment-template-armhf
   continuous-upload:
     <<: *job-template-upload
     environment:

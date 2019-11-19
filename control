@@ -1,15 +1,13 @@
 Source: mavlink
 Priority: optional
 Maintainer: Toby Schneider <tes.aubergine@gmail.com>
-Build-Depends: cdbs, debhelper (>= 8.0.0), cmake, python-future, python-lxml, python-dev
+Build-Depends: cdbs, debhelper (>= 8.0.0), cmake, python-lxml, python-dev, python-future
 Standards-Version: 3.9.4
 Section: libs
 Homepage: https://mavlink.io/en/
 
 Package: libmavlink-dev
 Section: libdevel
-Architecture: any
-Multi-Arch: same
-Depends: 
+Architecture: all
 Description: Development headers for MAVLink Library
  Library headers for MAVLink. MAVLink is a very lightweight messaging protocol for communicating with drones (and between onboard drone components).

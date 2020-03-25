@@ -31,6 +31,11 @@ environment-template-bionic: &environment-template-bionic
   DISTRO_RELEASE_CODENAME: "bionic"
   DISTRO_RELEASE_VERSION: "ubuntu18.04"
 
+environment-template-focal: &environment-template-focal
+  DISTRO_RELEASE_CODENAME: "focal"
+  DISTRO_RELEASE_VERSION: "ubuntu20.04"
+
+  
 ## Pre-declare Docker containers
 docker-base-stretch: &docker-base-stretch
   - image: gobysoft/debian-build-base:9.1
@@ -44,6 +49,9 @@ docker-base-xenial: &docker-base-xenial
 docker-base-bionic: &docker-base-bionic
   - image: gobysoft/ubuntu-build-base:18.04.1
 
+docker-base-focal: &docker-base-focal
+  - image: gobysoft/ubuntu-build-base:20.04.1
+    
 ## Pre-declare job templates
 job-template-amd64: &job-template-amd64
   working_directory: /root/debian
@@ -142,10 +150,16 @@ workflows:
           requires:
             - get-orig-source
 
+      - amd64-focal-build:
+          requires:
+            - get-orig-source
+
+            
       - continuous-upload:
           requires:
             - amd64-stretch-build
             - amd64-buster-build
+            - amd64-focal-build
             - amd64-bionic-build
             - amd64-xenial-build
 
@@ -156,10 +170,10 @@ workflows:
 jobs:
   get-orig-source:
     <<: *job-template-amd64
-    docker: *docker-base-bionic
+    docker: *docker-base-focal
     environment:
       <<: *environment-template-common
-      <<: *environment-template-bionic
+      <<: *environment-template-focal
       <<: *environment-template-amd64
     steps:
       - checkout
@@ -180,7 +194,7 @@ jobs:
             cd .. &&
             export NEWVERSION="$(echo /root/src/*.orig.tar.gz | sed 's/.*_\(.*\)\.orig\.tar\.gz/\1/')"
             COMMENT="Autobuild for version ${NEWVERSION}" &&
-            dch --newversion=${NEWVERSION}-7~DISTRORELEASEVERSION.1 -D DISTRORELEASECODENAME "${COMMENT}" &&
+            dch --newversion=${NEWVERSION}-8~DISTRORELEASEVERSION.1 -D DISTRORELEASECODENAME "${COMMENT}" &&
             cp debian/changelog /root/src
       - store_artifacts:
           path: /root/src
@@ -217,6 +231,13 @@ jobs:
     environment:
       <<: *environment-template-common
       <<: *environment-template-bionic
+      <<: *environment-template-amd64
+  amd64-focal-build:
+    <<: *job-template-amd64
+    docker: *docker-base-focal
+    environment:
+      <<: *environment-template-common
+      <<: *environment-template-focal
       <<: *environment-template-amd64
   continuous-upload:
     <<: *job-template-upload

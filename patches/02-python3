@@ -1,0 +1,39 @@
+Index: mavlink-1.0.12/CMakeLists.txt
+===================================================================
+--- mavlink-1.0.12.orig/CMakeLists.txt
++++ mavlink-1.0.12/CMakeLists.txt
+@@ -82,9 +82,6 @@ if (WITH_BUILD_STATIC)
+     endif()
+ endif()
+ 
+-# find libraries with cmake modules
+-find_package(PythonInterp)
+-
+ # enable languages
+ if (WITH_TESTS)
+     enable_language(C)
+@@ -128,7 +125,7 @@ macro(generateMavlink version definition
+         message(STATUS "processing: ${definitionAbsPath}")
+         add_custom_command( 
+             OUTPUT ${targetName}-stamp
+-            COMMAND PYTHONPATH=$ENV{PYTHONPATH}:${CMAKE_CURRENT_SOURCE_DIR} ${PYTHON_EXECUTABLE} -m pymavlink.tools.mavgen --lang=C ${extra_langs} --wire-protocol=${version}
++            COMMAND PYTHONPATH=$ENV{PYTHONPATH}:${CMAKE_CURRENT_SOURCE_DIR} /usr/bin/python3 -m pymavlink.tools.mavgen --lang=C ${extra_langs} --wire-protocol=${version}
+                 --output=include/v${version} ${definitionAbsPath}
+             COMMAND touch ${targetName}-stamp
+             )
+@@ -174,7 +171,14 @@ install(DIRECTORY ${CMAKE_BINARY_DIR}/in
+ install(DIRECTORY ${CMAKE_BINARY_DIR}/src/ DESTINATION share/${PROJECT_NAME} COMPONENT Dev FILES_MATCHING PATTERN "*.c*")
+ install(DIRECTORY ${MAVLINK_SOURCE_DIR}/share/${PROJECT_NAME} DESTINATION share COMPONENT Dev FILES_MATCHING PATTERN "*.c*")
+ if (UNIX)
+-    install(DIRECTORY ${MAVLINK_SOURCE_DIR}/pymavlink DESTINATION ${CMAKE_INSTALL_LIBDIR}/python${PYTHON_VERSION_MAJOR}.${PYTHON_VERSION_MINOR}/site-packages COMPONENT Dev)
++  execute_process(
++    COMMAND /usr/bin/python3 -c "if True:
++    from distutils import sysconfig as sc
++    print(sc.get_python_lib(prefix='', plat_specific=True))"
++    OUTPUT_VARIABLE PYTHON_SITE
++    OUTPUT_STRIP_TRAILING_WHITESPACE)
++  
++    install(DIRECTORY ${MAVLINK_SOURCE_DIR}/pymavlink DESTINATION ${PYTHON_SITE} COMPONENT Dev)
+ else ()
+     install(DIRECTORY ${MAVLINK_SOURCE_DIR}/pymavlink DESTINATION "share/pyshared" COMPONENT Dev)
+ endif ()

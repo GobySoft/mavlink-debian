@@ -1,7 +1,7 @@
 Source: mavlink
 Priority: optional
 Maintainer: Toby Schneider <tes.aubergine@gmail.com>
-Build-Depends: cdbs, debhelper (>= 8.0.0), cmake, python-lxml | python3-lxml, python-dev | python3-dev, python-future, python3-future
+Build-Depends: cdbs, debhelper (>= 8.0.0), cmake, python-lxml | python3-lxml, python-dev | python3-dev, python-future | python3-future
 Standards-Version: 3.9.4
 Section: libs
 Homepage: https://mavlink.io/en/

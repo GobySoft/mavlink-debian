@@ -3,7 +3,7 @@
 include /usr/share/cdbs/1/rules/debhelper.mk
 include /usr/share/cdbs/1/class/cmake.mk
 
-UPSTREAM_LAST_RELEASE = 1.0.12+gs1
+UPSTREAM_LAST_RELEASE = 1.0.12
 get-orig-source:
 	git clone https://github.com/GobySoft/mavlink.git -b $(UPSTREAM_LAST_RELEASE) /tmp/mavlink
 	git -C /tmp/mavlink submodule init 

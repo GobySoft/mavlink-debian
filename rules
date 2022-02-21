@@ -3,9 +3,9 @@
 include /usr/share/cdbs/1/rules/debhelper.mk
 include /usr/share/cdbs/1/class/cmake.mk
 
-UPSTREAM_LAST_RELEASE = 1.0.12
+UPSTREAM_LAST_RELEASE = 1.0.12+gs1
 get-orig-source:
-	git clone https://github.com/mavlink/mavlink.git -b $(UPSTREAM_LAST_RELEASE) /tmp/mavlink
+	git clone https://github.com/GobySoft/mavlink.git -b $(UPSTREAM_LAST_RELEASE) /tmp/mavlink
 	git -C /tmp/mavlink submodule init 
 	git -C /tmp/mavlink submodule update --recursive
 	debian/git_archive_all.py -C /tmp/mavlink --prefix=mavlink-$(UPSTREAM_LAST_RELEASE) mavlink_$(UPSTREAM_LAST_RELEASE).orig.tar.gz

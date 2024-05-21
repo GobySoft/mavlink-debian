@@ -1,0 +1,23 @@
+Index: mavlink-1.0.12/pymavlink/generator/mavgen.py
+===================================================================
+--- mavlink-1.0.12.orig/pymavlink/generator/mavgen.py
++++ mavlink-1.0.12/pymavlink/generator/mavgen.py
+@@ -9,8 +9,16 @@ Released under GNU GPL version 3 or late
+ '''
+ 
+ from __future__ import print_function
+-from future import standard_library
+-standard_library.install_aliases()
++
++try:
++    from urllib.parse import urlparse, urlencode, urljoin
++    from urllib.request import urlopen, Request
++    from urllib.error import HTTPError
++except ImportError:
++    from urlparse import urlparse  # type: ignore[no-redef]
++    from urllib import urlencode, urljoin  # type: ignore[no-redef,attr-defined]
++    from urllib2 import urlopen, Request, HTTPError  # type: ignore[no-redef]
++
+ from builtins import object
+ import os
+ import re

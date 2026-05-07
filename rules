@@ -1,6 +1,6 @@
 #!/usr/bin/make -f
 
-UPSTREAM_LAST_RELEASE = 1.0.12+gs1
+UPSTREAM_LAST_RELEASE = 2.0.0+20260507
 get-orig-source:
 	git clone https://github.com/GobySoft/mavlink.git -b $(UPSTREAM_LAST_RELEASE) /tmp/mavlink
 	git -C /tmp/mavlink submodule init 

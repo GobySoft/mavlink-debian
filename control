@@ -1,7 +1,7 @@
 Source: mavlink
 Priority: optional
 Maintainer: Toby Schneider <tes.aubergine@gmail.com>
-Build-Depends: debhelper (>= 13), cmake, python3-lxml (>= 4.3.2~), python3-dev (>=3.7.3~)
+Build-Depends: debhelper (>= 10), cmake, python3-lxml (>= 4.3.2~), python3-dev (>=3.7.3~)
 Standards-Version: 3.9.4
 Section: libs
 Homepage: https://mavlink.io/en/

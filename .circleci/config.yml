@@ -15,17 +15,13 @@ environment-template-amd64: &environment-template-amd64
   # one job only must do the source build for each distro
   DO_SOURCE_BUILD: "true"
 
-environment-template-bullseye: &environment-template-bullseye
-  DISTRO_RELEASE_CODENAME: "bullseye"
-  DISTRO_RELEASE_VERSION: "debian11"
-
 environment-template-bookworm: &environment-template-bookworm
   DISTRO_RELEASE_CODENAME: "bookworm"
   DISTRO_RELEASE_VERSION: "debian12"
 
-environment-template-focal: &environment-template-focal
-  DISTRO_RELEASE_CODENAME: "focal"
-  DISTRO_RELEASE_VERSION: "ubuntu20.04"
+environment-template-trixie: &environment-template-trixie
+  DISTRO_RELEASE_CODENAME: "trixie"
+  DISTRO_RELEASE_VERSION: "debian13"
 
 environment-template-jammy: &environment-template-jammy
   DISTRO_RELEASE_CODENAME: "jammy"
@@ -34,22 +30,26 @@ environment-template-jammy: &environment-template-jammy
 environment-template-noble: &environment-template-noble
   DISTRO_RELEASE_CODENAME: "noble"
   DISTRO_RELEASE_VERSION: "ubuntu24.04"
-  
-## Pre-declare Docker containers
-docker-base-bullseye: &docker-base-bullseye
-  - image: gobysoft/debian-build-base:11.1
 
+environment-template-resolute: &environment-template-resolute
+  DISTRO_RELEASE_CODENAME: "resolute"
+  DISTRO_RELEASE_VERSION: "ubuntu26.04"
+
+## Pre-declare Docker containers
 docker-base-bookworm: &docker-base-bookworm
   - image: gobysoft/debian-build-base:12.1
 
-docker-base-focal: &docker-base-focal
-  - image: gobysoft/ubuntu-build-base:20.04.1
+docker-base-trixie: &docker-base-trixie
+  - image: gobysoft/debian-build-base:13.1
 
 docker-base-jammy: &docker-base-jammy
   - image: gobysoft/ubuntu-build-base:22.04.1
 
 docker-base-noble: &docker-base-noble
   - image: gobysoft/ubuntu-build-base:24.04.1
+
+docker-base-resolute: &docker-base-resolute
+  - image: gobysoft/ubuntu-build-base:26.04.1
     
 ## Pre-declare job templates
 job-template-amd64: &job-template-amd64
@@ -116,10 +116,10 @@ job-template-amd64: &job-template-amd64
           - '*.changes'
           - '*.buildinfo'
   
-# base upload off noble build
+# base upload off resolute build
 job-template-upload: &job-template-upload
   <<: *job-template-amd64
-  docker: *docker-base-noble
+  docker: *docker-base-resolute
   
 ## Begin actual config
 version: 2
@@ -128,16 +128,16 @@ workflows:
   commit:
     jobs:
       - get-orig-source
-          
-#      - amd64-bullseye-build:
-#          requires:
-#            - get-orig-source
 
-      - amd64-bookworm-build:
+      - amd64-trixie-build:
           requires:
             - get-orig-source
 
-#      - amd64-focal-build:
+      - amd64-resolute-build:
+          requires:
+            - get-orig-source
+
+#      - amd64-bookworm-build:
 #          requires:
 #            - get-orig-source
 
@@ -145,19 +145,17 @@ workflows:
 #          requires:
 #            - get-orig-source
 
-      - amd64-noble-build:
-          requires:
-            - get-orig-source
+#      - amd64-noble-build:
+#          requires:
+#            - get-orig-source
 
-            
-            
       - continuous-upload:
           requires:
-#            - amd64-focal-build
+            - amd64-trixie-build
+            - amd64-resolute-build
+#            - amd64-bookworm-build
 #            - amd64-jammy-build
-#            - amd64-bullseye-build
-            - amd64-bookworm-build
-            - amd64-noble-build
+#            - amd64-noble-build
 
       - release-upload:
           requires:
@@ -166,17 +164,17 @@ workflows:
 jobs:
   get-orig-source:
     <<: *job-template-amd64
-    docker: *docker-base-noble
+    docker: *docker-base-resolute
     environment:
       <<: *environment-template-common
-      <<: *environment-template-noble
+      <<: *environment-template-resolute
       <<: *environment-template-amd64
     steps:
       - checkout
       - run:
           name: Install required packages
           command: |          
-            apt-get update && apt-get -y install cdbs wget python3
+            apt-get update && apt-get -y install wget python3
       - run:
           name: Get original source tarball
           command: |
@@ -200,12 +198,12 @@ jobs:
             - '*.tar.gz'
             - 'changelog'
             
-  amd64-bullseye-build:
+  amd64-trixie-build:
     <<: *job-template-amd64
-    docker: *docker-base-bullseye
+    docker: *docker-base-trixie
     environment:
       <<: *environment-template-common
-      <<: *environment-template-bullseye
+      <<: *environment-template-trixie
       <<: *environment-template-amd64
 
   amd64-bookworm-build:
@@ -216,13 +214,6 @@ jobs:
       <<: *environment-template-bookworm
       <<: *environment-template-amd64
 
-  amd64-focal-build:
-    <<: *job-template-amd64
-    docker: *docker-base-focal
-    environment:
-      <<: *environment-template-common
-      <<: *environment-template-focal
-      <<: *environment-template-amd64
   amd64-jammy-build:
     <<: *job-template-amd64
     docker: *docker-base-jammy
@@ -237,11 +228,18 @@ jobs:
       <<: *environment-template-common
       <<: *environment-template-noble
       <<: *environment-template-amd64
+  amd64-resolute-build:
+    <<: *job-template-amd64
+    docker: *docker-base-resolute
+    environment:
+      <<: *environment-template-common
+      <<: *environment-template-resolute
+      <<: *environment-template-amd64
   continuous-upload:
     <<: *job-template-upload
     environment:
       <<: *environment-template-common
-      <<: *environment-template-noble
+      <<: *environment-template-resolute
       <<: *environment-template-amd64
       UPLOAD_DESTINATION: "gobysoft-continuous"
     steps: &steps-upload
@@ -270,7 +268,7 @@ jobs:
     <<: *job-template-upload
     environment:
       <<: *environment-template-common
-      <<: *environment-template-noble
+      <<: *environment-template-resolute
       <<: *environment-template-amd64
       UPLOAD_DESTINATION: "gobysoft-release"
     steps: *steps-upload

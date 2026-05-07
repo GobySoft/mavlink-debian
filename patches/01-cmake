@@ -2,7 +2,25 @@ Index: mavlink-2.0.0+20260507/CMakeLists.txt
 ===================================================================
 --- mavlink-2.0.0+20260507.orig/CMakeLists.txt
 +++ mavlink-2.0.0+20260507/CMakeLists.txt
-@@ -26,20 +26,33 @@ endif()
+@@ -4,17 +4,6 @@ project(mavlink)
+ 
+ find_package(Python COMPONENTS Interpreter REQUIRED)
+ 
+-# We automatically install the pip dependencies locally below.
+-# Therefore, we check whether pip is available here.
+-execute_process(
+-    COMMAND ${Python_EXECUTABLE} -m pip -V
+-    RESULT_VARIABLE EXIT_CODE
+-    OUTPUT_QUIET
+-)
+-if (NOT ${EXIT_CODE} EQUAL 0)
+-    message(FATAL_ERROR "Python pip not found, pip is required")
+-endif()
+-
+ if (NOT MAVLINK_DIALECT)
+     set(MAVLINK_DIALECT common)
+ endif()
+@@ -26,20 +15,33 @@ endif()
  message(STATUS "MAVLink version: ${MAVLINK_VERSION}")
  
  set(EXAMPLE_HEADER ${CMAKE_CURRENT_BINARY_DIR}/include/mavlink/${MAVLINK_DIALECT}/mavlink.h)
@@ -39,7 +57,7 @@ Index: mavlink-2.0.0+20260507/CMakeLists.txt
  # Unfortunately, the dependencies don't work for INTERFACE libraries.
  # The only way I could make it work is to add ALL which means it
  # will do the file generation every time even when nothing has changed.
-@@ -47,6 +60,10 @@ add_custom_target(generate_c_headers
+@@ -47,6 +49,10 @@ add_custom_target(generate_c_headers
      ALL
      DEPENDS ${EXAMPLE_HEADER})
  
@@ -50,7 +68,7 @@ Index: mavlink-2.0.0+20260507/CMakeLists.txt
  add_library(mavlink INTERFACE)
  
  add_dependencies(mavlink generate_c_headers)
-@@ -65,7 +82,7 @@ install(TARGETS mavlink
+@@ -65,7 +71,7 @@ install(TARGETS mavlink
  
  install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/include/mavlink"
      DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}"
